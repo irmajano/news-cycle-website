@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -14,8 +13,6 @@ df = pd.read_json("data.json", orient='table')
 
 # Initialize number of topics
 n_topics = 0
-
-
 
 def update_df(df, n_topics):
     # Select first n topics
