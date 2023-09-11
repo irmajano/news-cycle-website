@@ -1,7 +1,11 @@
 import streamlit as st
-import requests
+#import requests
 import plotly.graph_objects as go
 import pandas as pd
+
+MAX_TOPICS = 20
+
+st.set_page_config(layout="wide")
 
 st.markdown('# News Cycle Aggregator')
 
@@ -31,7 +35,9 @@ def create_figure(x, y, labels):
                        mode='lines',
                        line=dict(width=0.5),
                        stackgroup='one',
-                       groupnorm='percent')
+                       groupnorm='percent',
+                       hoveron='fills',
+                       showlegend=True)
             )
     fig.update_layout(showlegend=True,
                       xaxis_type='category',
@@ -40,7 +46,7 @@ def create_figure(x, y, labels):
     return fig
 
 with st.form("submit_form"):
-    slider_val = st.slider('Select a number of topics', 1, len(df), 10)
+    slider_val = st.slider('Select a number of topics', 1, MAX_TOPICS, 10)
 
     submitted = st.form_submit_button("Submit")
     if submitted:
@@ -51,4 +57,5 @@ with st.form("submit_form"):
         y = df.values.tolist()
         labels = df.index.get_level_values('Name').tolist()
         fig = create_figure(x, y, labels)
-        st.plotly_chart(fig, use_container_width=True)
+        fig.update_xaxes(tickangle=45)
+        st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
