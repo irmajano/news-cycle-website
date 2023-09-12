@@ -8,7 +8,15 @@ REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-process
 
 st.set_page_config(layout="wide")
 
-st.markdown('# News Cycle Aggregator')
+st.title("NewsWatch")
+
+# change page names in the sidebar to "About" and "Sources"
+
+
+#st.title("NewsWatch Aggregator")
+
+# display the title "NewsWatch Aggregator" using Righteous Regular font
+#st.markdown("<h1 style='text-align: center; color: #000000; font-size: 50px; font-family: Righteous, sans-serif;'>NewsWatch Aggregator</h1>", unsafe_allow_html=True)
 
 # Temporarily reading data from file
 #df = pd.read_json("data.json", orient='table')
@@ -16,7 +24,8 @@ st.markdown('# News Cycle Aggregator')
 # Initialize number of topics
 slider_val = 5
 
-def process_request(r):
+def process_request():
+    r = requests.get(REQUEST_URL).json()
     df = pd.read_json(r)
     df['date'] = pd.to_datetime(df['date']).dt.date #add column with only date, without time
     new_df = pd.DataFrame()
@@ -37,7 +46,10 @@ def update_df(df, n_topics):
     df = df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
     return df
 
-def create_figure(x, y, labels):
+def create_figure(df):
+    x = df.columns.values.tolist()
+    y = df.values.tolist()
+    labels = df.index.values.tolist()
     fig = go.Figure()
     for y_, label in zip(y, labels):
         fig.add_trace(
@@ -49,33 +61,38 @@ def create_figure(x, y, labels):
                        line_shape='spline',
                        stackgroup='one',
                        groupnorm='percent',
-                       hoveron='fills',
+                       hoveron='fills+points',
                        showlegend=True)
             )
     fig.update_layout(
         showlegend=True,
         xaxis_type='category',
-        yaxis=dict(type='linear', range=[1, 100],
-                    ticksuffix='%'),
-        title=f'Top {slider_val} topics between {x[0]} and {x[-1]}'
-        )
-    fig.update_xaxes(tickangle=45)
+        yaxis=dict(type='linear', range=[1, 100], ticksuffix='%'),
+        title_text=f'Top {slider_val} topics between {x[0]} and {x[-1]}',
+        title_x=0.3,
+        title_font_size=20,
+        hovermode='x unified'
+    )
+    fig.update_xaxes(tickangle=45) #rotate x-axis labels
     return fig
 
-r = requests.get(REQUEST_URL).json()
-df = process_request(r)
+df = process_request()
 
 with st.form("submit_form"):
     slider_val = st.slider('Select a number of topics', 1, MAX_TOPICS, 5)
-
     submitted = st.form_submit_button("Submit")
     if submitted:
         n_topics = slider_val
         df = update_df(df, n_topics)
-        # Get x, y and labels
-        x = df.columns.values.tolist()
-        y = df.values.tolist()
-        labels = df.index.values.tolist()
         #labels = df.index.get_level_values('Name').tolist()
-        fig = create_figure(x, y, labels)
+        fig = create_figure(df)
         st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
+
+# add a sidebar with an About section that explains the app
+#st.sidebar.markdown('## About')
+st.sidebar.info('''
+NewsWatch is a prototype of a news cycle aggregator. It uses a topic modeling algorithm to extract topics from news articles and then visualizes the results in a streamgraph. The app is built with [Streamlit](https://streamlit.io/) and [Plotly](https://plotly.com/).
+''')
+
+# Place the logo at the bottom in the sidebar
+st.sidebar.image('newswatch-high-resolution-color-logo.png', width=300)
