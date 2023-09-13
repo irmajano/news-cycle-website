@@ -3,6 +3,8 @@ import requests
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
+import random
+
 
 MAX_TOPICS = 20
 REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
@@ -54,13 +56,17 @@ def create_figure(df):
     y = df.values.tolist()
     labels = df.index.values.tolist()
     fig = go.Figure()
-    for y_, label in zip(y, labels):
+    num_colors = len(y)
+    colors = [f'hsl({i * 360 // num_colors}, 100%, 50%)' for i in range(num_colors)]
+    random.shuffle(colors)
+
+    for y_, label, color in zip(y, labels, colors):
         fig.add_trace(
             go.Scatter(x=x,
                        y=y_,
                        name=label,
                        mode='lines',
-                       line=dict(width=0.5),
+                       line=dict(width=0.5, color=color),
                        line_shape='spline',
                        stackgroup='one',
                        groupnorm='percent',
