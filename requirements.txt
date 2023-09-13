@@ -1,4 +1,8 @@
 streamlit
 requests
 plotly
+matplotlib
 pandas
+wordcloud
+datetime
+random

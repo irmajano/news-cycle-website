@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import plotly.graph_objects as go
 import pandas as pd
-from streamlit_card import card
 from datetime import date
 from random import shuffle
 
