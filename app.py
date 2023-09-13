@@ -6,20 +6,54 @@ import pandas as pd
 MAX_TOPICS = 20
 REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title='NewsWatch')
 
-st.title("NewsWatch")
+# # Custom CSS for styling
+# st.markdown("""
+# <style>
+# body {
+#     background-color: #F3ECF3;
+#     color: #121640;
+#     font-family: sans-serif
+# }
+# .sidebar .sidebar-content {
+#     background-color: #121640;
+#     color: #F3ECF3;
+# }
+# </style>
+# """, unsafe_allow_html=True)
 
+def add_logo():
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebarNav"] {
+                background-image: url(https://i.postimg.cc/G37XtY0J/3.png);
+                background-size: 300px;
+                width: 900;
+                height: 900px;
+                background-repeat: no-repeat;
+                background-position-x: 60%;
+                background-position-y: top;
+                padding-top: 120px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+add_logo()
 # change page names in the sidebar to "About" and "Sources"
 
 
-#st.title("NewsWatch Aggregator")
+st.title("NewsWatch Aggregator")
 
 # display the title "NewsWatch Aggregator" using Righteous Regular font
 #st.markdown("<h1 style='text-align: center; color: #000000; font-size: 50px; font-family: Righteous, sans-serif;'>NewsWatch Aggregator</h1>", unsafe_allow_html=True)
 
 # Temporarily reading data from file
 #df = pd.read_json("data.json", orient='table')
+
+
 
 # Initialize number of topics
 slider_val = 5
@@ -89,10 +123,12 @@ with st.form("submit_form"):
         st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
 
 # add a sidebar with an About section that explains the app
-#st.sidebar.markdown('## About')
+
+st.sidebar.markdown('## About')
+
 st.sidebar.info('''
 NewsWatch is a prototype of a news cycle aggregator. It uses a topic modeling algorithm to extract topics from news articles and then visualizes the results in a streamgraph. The app is built with [Streamlit](https://streamlit.io/) and [Plotly](https://plotly.com/).
 ''')
 
 # Place the logo at the bottom in the sidebar
-st.sidebar.image('newswatch-high-resolution-color-logo.png', width=300)
+st.sidebar.image('3.png', width=300)
