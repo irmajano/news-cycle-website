@@ -21,7 +21,7 @@ install_requirements:
 # ----------------------------------
 
 streamlit:
-	-@streamlit run 🏠_Home.py
+	-@streamlit run Home.py
 
 
 # ----------------------------------
