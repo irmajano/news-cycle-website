@@ -22,7 +22,7 @@ def add_logo():
             }
         </style>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
@@ -47,7 +47,7 @@ The app uses a topic modeling algorithm to extract topics from news articles and
 
 add_logo()
 
-@st.cache
+@st.cache_data
 def process_request(df):
     df['date'] = pd.to_datetime(df['date']).dt.date #add column with only date, without time
     new_df = pd.DataFrame()
@@ -83,25 +83,19 @@ NUM_DOCUMENTS = df['count'].sum()
 NUM_TOPICS = len(df.groupby('topic'))
 FIRST_DAY = None
 LAST_DAY = None
-from pages.Sources import NUM_SOURCES
 
-
-st.markdown(f"**NewsWatch** is currently based on:")
-col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds", f"{'{:,}'.format(NUM_SOURCES)}", help='Number of RSS feeds scraped')
-col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
-col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
-
-@st.cache
+@st.cache_data
 def update_df(n_topics):
     # Select first n topics
     new_df = PROCESSED_DF.iloc[:n_topics, :]
     # Convert document counts to percentages
-    new_df = new_df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
+    new_df = new_df.apply(lambda x: x / x.sum() * 100, axis=0).fillna(0)
     new_df = new_df.drop(columns=[str(date.today())])
+    #format values in new_df to 2 decimal places
+    new_df = new_df.round(2)
     return new_df
 
-@st.cache
+@st.cache_data
 def create_figure(df):
     x = df.columns.values.tolist()
     y = df.values.tolist()
@@ -116,7 +110,7 @@ def create_figure(df):
         fig.add_trace(
             go.Scatter(x=x,
                        y=y_,
-                       name=label,
+                       name=label.title(),
                        mode='lines',
                        line=dict(width=0.5, color=color),
                        line_shape='spline',
@@ -138,6 +132,14 @@ def create_figure(df):
     )
     fig.update_xaxes(tickangle=45) #rotate x-axis labels
     return fig
+
+from pages.Sources import NUM_SOURCES
+st.markdown(f"**NewsWatch** is currently based on:")
+col1, col2, col3 = st.columns(3)
+col1.metric("RSS Feeds", f"{'{:,}'.format(NUM_SOURCES)}", help='Number of RSS feeds scraped')
+col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
+col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
+
 
 if submitted:
     n_topics = slider_val

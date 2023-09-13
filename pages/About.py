@@ -19,11 +19,8 @@ def add_logo():
             }
         </style>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
-
-# Place the logo at the bottom in the sidebar
-st.sidebar.image('newswatch_logo.png', use_column_width=True)
 
 add_logo()
 

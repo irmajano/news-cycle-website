@@ -18,7 +18,7 @@ def add_logo():
             }
         </style>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
 # Define the API endpoint URL
@@ -36,8 +36,6 @@ def fetch_data():
         return None
 
 st.title("Sources")
-# Place the logo at the bottom in the sidebar
-st.sidebar.image('newswatch_logo.png', use_column_width=True)
 add_logo()
 
 # Fetch data from the API
