@@ -1,26 +1,5 @@
 import streamlit as st
-import requests
-from pages.Sources import NUM_SOURCES
-
-def add_logo():
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
-                background-size: 250px;
-                width: 900;
-                height: 900px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-position-x: 60%;
-                background-position-y: 50px;
-                padding-top: 250px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+from utils.utils import add_logo
 
 # Place the logo at the bottom in the sidebar
 st.sidebar.image('newswatch_logo.png', use_column_width=True)

@@ -1,34 +1,14 @@
 import streamlit as st
-import requests
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
+from utils.utils import fetch_data, add_logo, create_df, get_top_20
+# from pages.Sources import NUM_SOURCES
 from random import shuffle
-
-def add_logo():
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
-                background-size: 250px;
-                width: 900;
-                height: 900px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-position-x: 60%;
-                background-position-y: 50px;
-                padding-top: 250px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
 MAX_TOPICS = 20
-REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
 
 submitted = False # Initialize Submit button state
 slider_val = 5 # Initialize number of topics
@@ -47,7 +27,7 @@ The app uses a topic modeling algorithm to extract topics from news articles and
 
 add_logo()
 
-@st.cache
+# @st.cache
 def process_request(df):
     df['date'] = pd.to_datetime(df['date']).dt.date #add column with only date, without time
     new_df = pd.DataFrame()
@@ -61,20 +41,12 @@ def process_request(df):
     new_df.sort_index(inplace = True, axis=1)
     return new_df
 
-r = requests.get(REQUEST_URL).json()
-df = pd.read_json(r)
-#drop rows with empty topic column
-df = df[df['topic'].str.len() > 1]
-#drop rows with nan values in topic column
-df = df.dropna(subset=['topic'])
+df = create_df()
 
-#group df by topic and remove rows with only one date
-df = df.groupby('topic').filter(lambda x: len(x) > 1)
-#remove rows with less than 10 in count column
-df = df[df['count'] > 10]
+
 
 #group df by topic, group by the sum of values in "count" column for each topic, add the "representative_words" and "representative_articles" columns, and sort by the sum of values in descending order, Keep the topic column as a column instead of an index
-top_20 = df.groupby('topic').agg({'count': 'sum', 'representative_words': 'first', 'representative_articles': 'first'}).sort_values(by=['count'], ascending=False).reset_index()
+top_20 = get_top_20(df)
 TOP_20_TOPICS = top_20.head(MAX_TOPICS)
 
 PROCESSED_DF = process_request(df)
@@ -83,16 +55,20 @@ NUM_DOCUMENTS = df['count'].sum()
 NUM_TOPICS = len(df.groupby('topic'))
 FIRST_DAY = None
 LAST_DAY = None
-from pages.Sources import NUM_SOURCES
 
+# Fetch data from the API
+data = fetch_data()
+num_sources = data.get("feed_count", 0)
 
 st.markdown(f"**NewsWatch** is currently based on:")
 col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds", f"{'{:,}'.format(NUM_SOURCES)}", help='Number of RSS feeds scraped')
+col1.metric("RSS Feeds",
+            f"{'{:,}'.format(num_sources)}",
+            help='Number of RSS feeds scraped')
 col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
 col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
 
-@st.cache
+# @st.cache
 def update_df(n_topics):
     # Select first n topics
     new_df = PROCESSED_DF.iloc[:n_topics, :]
@@ -101,7 +77,7 @@ def update_df(n_topics):
     new_df = new_df.drop(columns=[str(date.today())])
     return new_df
 
-@st.cache
+# @st.cache
 def create_figure(df):
     x = df.columns.values.tolist()
     y = df.values.tolist()
