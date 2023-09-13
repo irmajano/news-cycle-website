@@ -1,6 +1,4 @@
 import streamlit as st
-import requests
-from pages.Sources import NUM_SOURCES
 from utils.utils import add_logo
 
 # Place the logo at the bottom in the sidebar
