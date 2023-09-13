@@ -1,6 +1,13 @@
 import requests
 import streamlit as st
-# Fetch
+import requests
+import pandas as pd
+
+REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
+# Define the API endpoint URL
+API_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-sources'
+API_KEY = 'c5f4ff6906b0c8ef5a34c027fddc2c59'
+
 
 def add_logo():
     st.markdown(
@@ -32,6 +39,24 @@ def fetch_data():
         st.error("Failed to fetch data from the API.")
         return None
 
-# Define the API endpoint URL
-API_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-sources'
-API_KEY = 'c5f4ff6906b0c8ef5a34c027fddc2c59'
+
+def create_df():
+    r = requests.get(REQUEST_URL).json()
+
+    df = pd.read_json(r)
+    #drop rows with empty topic column
+    df = df[df['topic'].str.len() > 1]
+    #drop rows with nan values in topic column
+    df = df.dropna(subset=['topic'])
+
+    #group df by topic and remove rows with only one date
+    df = df.groupby('topic').filter(lambda x: len(x) > 1)
+    #remove rows with less than 10 in count column
+    return df[df['count'] > 10]
+
+def get_top_20(df):
+    return df.groupby('topic').agg({
+        'count': 'sum',
+        'representative_words': 'first',
+        'representative_articles': 'first'
+    }).sort_values(by=['count'], ascending=False).reset_index()

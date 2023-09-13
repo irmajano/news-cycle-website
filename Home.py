@@ -1,16 +1,14 @@
 import streamlit as st
-import requests
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
-from utils.utils import fetch_data, add_logo
+from utils.utils import fetch_data, add_logo, create_df, get_top_20
 # from pages.Sources import NUM_SOURCES
 from random import shuffle
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
 MAX_TOPICS = 20
-REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
 
 submitted = False # Initialize Submit button state
 slider_val = 5 # Initialize number of topics
@@ -43,20 +41,12 @@ def process_request(df):
     new_df.sort_index(inplace = True, axis=1)
     return new_df
 
-r = requests.get(REQUEST_URL).json()
-df = pd.read_json(r)
-#drop rows with empty topic column
-df = df[df['topic'].str.len() > 1]
-#drop rows with nan values in topic column
-df = df.dropna(subset=['topic'])
+df = create_df()
 
-#group df by topic and remove rows with only one date
-df = df.groupby('topic').filter(lambda x: len(x) > 1)
-#remove rows with less than 10 in count column
-df = df[df['count'] > 10]
+
 
 #group df by topic, group by the sum of values in "count" column for each topic, add the "representative_words" and "representative_articles" columns, and sort by the sum of values in descending order, Keep the topic column as a column instead of an index
-top_20 = df.groupby('topic').agg({'count': 'sum', 'representative_words': 'first', 'representative_articles': 'first'}).sort_values(by=['count'], ascending=False).reset_index()
+top_20 = get_top_20(df)
 TOP_20_TOPICS = top_20.head(MAX_TOPICS)
 
 PROCESSED_DF = process_request(df)
