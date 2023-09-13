@@ -48,6 +48,11 @@ df = df[df['topic'].str.len() > 1]
 #drop rows with nan values in topic column
 df = df.dropna(subset=['topic'])
 
+#group df by topic and remove rows with only one date
+df = df.groupby('topic').filter(lambda x: len(x) > 1)
+#remove rows with less than 10 in count column
+df = df[df['count'] > 10]
+
 #Check df
 #df
 
