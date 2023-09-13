@@ -75,6 +75,7 @@ def update_df(n_topics):
     new_df = PROCESSED_DF.iloc[:n_topics, :]
     # Convert document counts to percentages
     new_df = new_df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
+    new_df = new_df.drop(columns=[str(date.today())])
     return new_df
 
 @st.cache
@@ -85,13 +86,18 @@ def create_figure(df):
     FIRST_DAY = x[0]
     LAST_DAY = x[-1]
     fig = go.Figure()
-    for y_, label in zip(y, labels):
+    num_colors = len(y)
+    colors = [
+        f'hsl({i * 360 // num_colors}, 100%, 50%)' for i in range(num_colors)
+    ]
+    random.shuffle(colors)
+    for y_, label in zip(y, labels, colors):
         fig.add_trace(
             go.Scatter(x=x,
                        y=y_,
                        name=label,
                        mode='lines',
-                       line=dict(width=0.5),
+                       line=dict(width=0.5, color=color),
                        line_shape='spline',
                        stackgroup='one',
                        groupnorm='percent',
