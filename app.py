@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import plotly.graph_objects as go
 import pandas as pd
+from datetime import date
 
 MAX_TOPICS = 20
 REQUEST_URL = 'https://news-cycle-aggregator-fudwhg6x5q-ew.a.run.app/get-processed'
@@ -44,6 +45,8 @@ def update_df(df, n_topics):
     df = df.iloc[:n_topics, :]
     # Convert document counts to percentages
     df = df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
+    # Drop rows with today's date
+    df = df.drop(columns=[str(date.today())])
     return df
 
 def create_figure(df):
