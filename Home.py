@@ -3,27 +3,9 @@ import requests
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
+from utils.utils import fetch_data, add_logo
+# from pages.Sources import NUM_SOURCES
 from random import shuffle
-
-def add_logo():
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
-                background-size: 250px;
-                width: 900;
-                height: 900px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-position-x: 60%;
-                background-position-y: 50px;
-                padding-top: 250px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
@@ -47,7 +29,7 @@ The app uses a topic modeling algorithm to extract topics from news articles and
 
 add_logo()
 
-@st.cache
+# @st.cache
 def process_request(df):
     df['date'] = pd.to_datetime(df['date']).dt.date #add column with only date, without time
     new_df = pd.DataFrame()
@@ -83,16 +65,20 @@ NUM_DOCUMENTS = df['count'].sum()
 NUM_TOPICS = len(df.groupby('topic'))
 FIRST_DAY = None
 LAST_DAY = None
-from pages.Sources import NUM_SOURCES
 
+# Fetch data from the API
+data = fetch_data()
+num_sources = data.get("feed_count", 0)
 
 st.markdown(f"**NewsWatch** is currently based on:")
 col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds", f"{'{:,}'.format(NUM_SOURCES)}", help='Number of RSS feeds scraped')
+col1.metric("RSS Feeds",
+            f"{'{:,}'.format(num_sources)}",
+            help='Number of RSS feeds scraped')
 col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
 col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
 
-@st.cache
+# @st.cache
 def update_df(n_topics):
     # Select first n topics
     new_df = PROCESSED_DF.iloc[:n_topics, :]
@@ -101,7 +87,7 @@ def update_df(n_topics):
     new_df = new_df.drop(columns=[str(date.today())])
     return new_df
 
-@st.cache
+# @st.cache
 def create_figure(df):
     x = df.columns.values.tolist()
     y = df.values.tolist()
