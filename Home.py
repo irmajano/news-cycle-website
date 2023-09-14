@@ -42,6 +42,7 @@ def process_request(df):
     return new_df
 
 df = create_df()
+df
 
 
 
@@ -74,7 +75,9 @@ def update_df(n_topics):
     new_df = PROCESSED_DF.iloc[:n_topics, :]
     # Convert document counts to percentages
     new_df = new_df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
-    new_df = new_df.drop(columns=[str(date.today())])
+    #if today's date is found as a column in new_df, drop it
+    if str(date.today()) in new_df.columns:
+        new_df = new_df.drop(columns=[str(date.today())])
     return new_df
 
 # @st.cache
