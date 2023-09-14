@@ -16,8 +16,6 @@ def add_logo():
             [data-testid="stSidebarNav"] {
                 background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
                 background-size: 250px;
-                width: 900;
-                #height: 900px;
                 background-repeat: no-repeat;
                 background-position: center;
                 background-position-x: 60%;
@@ -58,4 +56,4 @@ def get_top_20(df):
     return df.groupby('topic').agg({
         'count': 'sum',
         'representative_words': 'first'
-    }).sort_values(by=['count'], ascending=False).reset_index()
+    }).sort_values(by=['count'], ascending=False).reset_index().head(20)
