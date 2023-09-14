@@ -1,9 +1,6 @@
 import streamlit as st
 from utils.utils import add_logo
 
-# Place the logo at the bottom in the sidebar
-st.sidebar.image('newswatch_logo.png', use_column_width=True)
-
 add_logo()
 
 # Explain the app

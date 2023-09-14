@@ -3,8 +3,6 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from utils.utils import add_logo, create_df, get_top_20, REQUEST_URL
 
-# Place the logo at the bottom in the sidebar
-st.sidebar.image('newswatch_logo.png', use_column_width=True)
 add_logo()
 
 st.title("Top Topics of the Week")
