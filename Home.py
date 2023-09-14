@@ -2,8 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
-from utils.utils import fetch_data, add_logo, create_df, get_top_20
-# from pages.Sources import NUM_SOURCES
+from utils.utils import add_logo, fetch_data, create_df, get_top_20
 from random import shuffle
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
@@ -15,7 +14,10 @@ slider_val = 5 # Initialize number of topics
 
 with st.sidebar:
     with st.form(key='my_form'):
-        slider_val = st.slider('Select number of top news topics to visualize', 1, MAX_TOPICS, 5)
+        st.info('**Update the graph** by selecting the number of top news topics to visualize.')
+        #add info in bold
+
+        slider_val = st.slider('Number of topics to display', 1, MAX_TOPICS, 5)
         submitted = st.form_submit_button(label='Submit')
 
 st.title("NewsWatch")
@@ -27,7 +29,7 @@ The app uses a topic modeling algorithm to extract topics from news articles and
 
 add_logo()
 
-# @st.cache
+@st.cache_data
 def process_request(df):
     df['date'] = pd.to_datetime(df['date']).dt.date #add column with only date, without time
     new_df = pd.DataFrame()
@@ -42,9 +44,6 @@ def process_request(df):
     return new_df
 
 df = create_df()
-df
-
-
 
 #group df by topic, group by the sum of values in "count" column for each topic, add the "representative_words" and "representative_articles" columns, and sort by the sum of values in descending order, Keep the topic column as a column instead of an index
 top_20 = get_top_20(df)
@@ -63,24 +62,27 @@ num_sources = data.get("feed_count", 0)
 
 st.markdown(f"**NewsWatch** is currently based on:")
 col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds",
-            f"{'{:,}'.format(num_sources)}",
-            help='Number of RSS feeds scraped')
+col1.metric("RSS Feeds", f"{'{:,}'.format(num_sources)}", help='Number of RSS feeds scraped')
 col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
 col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
 
-# @st.cache
+@st.cache_data
 def update_df(n_topics):
     # Select first n topics
     new_df = PROCESSED_DF.iloc[:n_topics, :]
     # Convert document counts to percentages
-    new_df = new_df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
+    new_df = new_df.apply(lambda x: x / x.sum() * 100, axis=0).fillna(0)
     #if today's date is found as a column in new_df, drop it
     if str(date.today()) in new_df.columns:
         new_df = new_df.drop(columns=[str(date.today())])
+    #format values in new_df to 2 decimal places
+    new_df = new_df.round(2)
     return new_df
 
-# @st.cache
+#draw a horizontal line
+st.markdown("""---""")
+
+@st.cache_data
 def create_figure(df):
     x = df.columns.values.tolist()
     y = df.values.tolist()
@@ -108,7 +110,7 @@ def create_figure(df):
         showlegend=True,
         xaxis_type='category',
         yaxis=dict(type='linear', range=[1, 100], ticksuffix='%'),
-        title_text=f'Last week in topics',
+        title_text=f'Evolution of {slider_val} topics last week',
         title_x=0.3,
         title_font_size=20,
         hovermode='x unified',

@@ -17,7 +17,7 @@ def add_logo():
                 background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
                 background-size: 250px;
                 width: 900;
-                height: 900px;
+                #height: 900px;
                 background-repeat: no-repeat;
                 background-position: center;
                 background-position-x: 60%;
