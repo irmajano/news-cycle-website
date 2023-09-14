@@ -6,6 +6,26 @@ from utils.utils import fetch_data, add_logo, create_df, get_top_20
 # from pages.Sources import NUM_SOURCES
 from random import shuffle
 
+def add_logo():
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebarNav"] {
+                background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
+                background-size: 250px;
+                width: 900;
+                height: 900px;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-position-x: 60%;
+                background-position-y: 50px;
+                padding-top: 250px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
 MAX_TOPICS = 20
@@ -59,7 +79,7 @@ def update_df(n_topics):
     # Select first n topics
     new_df = PROCESSED_DF.iloc[:n_topics, :]
     # Convert document counts to percentages
-    new_df = new_df.apply(lambda x: x / x.sum(), axis=0).fillna(0)
+    new_df = new_df.apply(lambda x: x / x.sum() * 100, axis=0).fillna(0)
     #if today's date is found as a column in new_df, drop it
     if str(date.today()) in new_df.columns:
         new_df = new_df.drop(columns=[str(date.today())])
