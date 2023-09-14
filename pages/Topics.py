@@ -3,13 +3,16 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from utils.utils import add_logo, create_df, get_top_20, REQUEST_URL
 
+st.set_page_config(layout="wide", page_title='Topics')
+
 add_logo()
 
-st.title("Top Topics of the Week")
-st.markdown('''
-Explore the top 20 topics of the week.\n
-Each topic is a wordcloud that shows the most representative words in it.
-''')
+st.title("Top 20 Topics")
+st.subheader('Explore the top 20 topics of the past week.')
+st.write('''
+Each topic represented by a <a href="http://amueller.github.io/word_cloud/" target="_blank">**word cloud**</a> that displays the most representative words forming it.''', unsafe_allow_html=True)
+
+st.markdown("""---""")
 
 df = create_df()
 
@@ -21,9 +24,11 @@ for index, row in top_20.iterrows():
     text = ', '.join(row['representative_words'])
     # Create and generate a word cloud image:
     wordcloud = WordCloud().generate(text)
-    st.markdown(f"### {row['topic']}".title())
+    st.markdown(f"### *Topic:* {row['topic']}".title())
     # Display the generated image:
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     fig = plt.gcf()
     st.pyplot(fig)
+    with st.expander("**Expand to see the words in this topic**"):
+        st.write(text)
