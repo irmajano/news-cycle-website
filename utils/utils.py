@@ -57,6 +57,5 @@ def create_df():
 def get_top_20(df):
     return df.groupby('topic').agg({
         'count': 'sum',
-        'representative_words': 'first',
-        'representative_articles': 'first'
+        'representative_words': 'first'
     }).sort_values(by=['count'], ascending=False).reset_index()
