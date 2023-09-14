@@ -2,29 +2,8 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
-from utils.utils import fetch_data, add_logo, create_df, get_top_20
-# from pages.Sources import NUM_SOURCES
+from utils.utils import add_logo, fetch_data, create_df, get_top_20
 from random import shuffle
-
-def add_logo():
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                background-image: url(https://i.postimg.cc/QNH0Rdz4/2.png);
-                background-size: 250px;
-                width: 900;
-                height: 900px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-position-x: 60%;
-                background-position-y: 50px;
-                padding-top: 250px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
@@ -35,7 +14,10 @@ slider_val = 5 # Initialize number of topics
 
 with st.sidebar:
     with st.form(key='my_form'):
-        slider_val = st.slider('Select number of top news topics to visualize', 1, MAX_TOPICS, 5)
+        st.info('**Update the graph** by selecting the number of top news topics to visualize.')
+        #add info in bold
+
+        slider_val = st.slider('Number of topics to display', 1, MAX_TOPICS, 5)
         submitted = st.form_submit_button(label='Submit')
 
 st.title("NewsWatch")
@@ -74,6 +56,16 @@ NUM_TOPICS = len(df.groupby('topic'))
 FIRST_DAY = None
 LAST_DAY = None
 
+# Fetch data from the API
+data = fetch_data()
+num_sources = data.get("feed_count", 0)
+
+st.markdown(f"**NewsWatch** is currently based on:")
+col1, col2, col3 = st.columns(3)
+col1.metric("RSS Feeds", f"{'{:,}'.format(num_sources)}", help='Number of RSS feeds scraped')
+col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
+col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
+
 @st.cache_data
 def update_df(n_topics):
     # Select first n topics
@@ -86,6 +78,9 @@ def update_df(n_topics):
     #format values in new_df to 2 decimal places
     new_df = new_df.round(2)
     return new_df
+
+#draw a horizontal line
+st.markdown("""---""")
 
 @st.cache_data
 def create_figure(df):
@@ -115,7 +110,7 @@ def create_figure(df):
         showlegend=True,
         xaxis_type='category',
         yaxis=dict(type='linear', range=[1, 100], ticksuffix='%'),
-        title_text=f'Last week in topics',
+        title_text=f'Evolution of {slider_val} topics last week',
         title_x=0.3,
         title_font_size=20,
         hovermode='x unified',
@@ -124,14 +119,6 @@ def create_figure(df):
     )
     fig.update_xaxes(tickangle=45) #rotate x-axis labels
     return fig
-
-from pages.Sources import NUM_SOURCES
-st.markdown(f"**NewsWatch** is currently based on:")
-col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds", f"{'{:,}'.format(NUM_SOURCES)}", help='Number of RSS feeds scraped')
-col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
-col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
-
 
 if submitted:
     n_topics = slider_val

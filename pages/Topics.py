@@ -22,11 +22,8 @@ for index, row in top_20.iterrows():
     # Create and generate a word cloud image:
     wordcloud = WordCloud().generate(text)
     st.markdown(f"### {row['topic']}".title())
-
     # Display the generated image:
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    #plt.show()
     fig = plt.gcf()
-    #display the figure in size
     st.pyplot(fig)
