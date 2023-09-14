@@ -3,7 +3,7 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from utils.utils import add_logo, create_df, get_top_20, REQUEST_URL
 
-st.set_page_config(layout="wide", page_title='Topics')
+st.set_page_config(layout="centered", page_title='Topics')
 
 add_logo()
 

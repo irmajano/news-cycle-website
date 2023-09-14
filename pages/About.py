@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.utils import add_logo
 
-st.set_page_config(layout="wide", page_title='About')
+st.set_page_config(layout="centered", page_title='About')
 
 add_logo()
 
