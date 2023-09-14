@@ -95,7 +95,7 @@ def create_figure(df):
         fig.add_trace(
             go.Scatter(x=x,
                        y=y_,
-                       name=label,
+                       name=label.title(),
                        mode='lines',
                        line=dict(width=0.5, color=color),
                        line_shape='spline',
