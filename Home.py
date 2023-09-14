@@ -14,17 +14,16 @@ slider_val = 5 # Initialize number of topics
 
 with st.sidebar:
     with st.form(key='my_form'):
-        st.info('**Update the graph** by selecting the number of top news topics to visualize.')
+        st.info(':information_source: **Update the graph:** choose how many topics to display')
         #add info in bold
 
-        slider_val = st.slider('Number of topics to display', 1, MAX_TOPICS, 5)
+        slider_val = st.slider('Select number of topics to visualize', 1, MAX_TOPICS, 5)
         submitted = st.form_submit_button(label='Submit')
 
 st.title("NewsWatch")
 st.subheader("Visualize last week's trending topics in world news")
 st.markdown(f"""
-**NewsWatch** is a news aggregator that collects news from last week from a wide range of RSS feeds and displays them in a single place.\n
-The app uses a topic modeling algorithm to extract topics from news articles and then visualizes the results in a streamgraph.
+**NewsWatch** is a news aggregator that collects news from the past week and boils them down to 20 topics for you to visualize and consult.\n
 """)
 
 add_logo()
@@ -44,13 +43,9 @@ def process_request(df):
     return new_df
 
 df = create_df()
-
-#group df by topic, group by the sum of values in "count" column for each topic, add the "representative_words" and "representative_articles" columns, and sort by the sum of values in descending order, Keep the topic column as a column instead of an index
-top_20 = get_top_20(df)
-TOP_20_TOPICS = top_20.head(MAX_TOPICS)
-
-PROCESSED_DF = process_request(df)
-NUM_DOCUMENTS = df['count'].sum()
+processed_df = process_request(df)
+PROCESSED_DF = processed_df
+num_documents = df['count'].sum()
 # get the number of topics in PROCESSED_DF by grouping by the "topic" column and counting the number of groups
 NUM_TOPICS = len(df.groupby('topic'))
 FIRST_DAY = None
@@ -59,12 +54,6 @@ LAST_DAY = None
 # Fetch data from the API
 data = fetch_data()
 num_sources = data.get("feed_count", 0)
-
-st.markdown(f"**NewsWatch** is currently based on:")
-col1, col2, col3 = st.columns(3)
-col1.metric("RSS Feeds", f"{'{:,}'.format(num_sources)}", help='Number of RSS feeds scraped')
-col2.metric("News Articles", f"{'{:,}'.format(NUM_DOCUMENTS)}", help='Number of news articles analyzed')
-col3.metric("Topics Extracted", f"{'{:,}'.format(NUM_TOPICS)}", help='Number of topics automatically extracted from the news articles')
 
 @st.cache_data
 def update_df(n_topics):
@@ -79,7 +68,6 @@ def update_df(n_topics):
     new_df = new_df.round(2)
     return new_df
 
-#draw a horizontal line
 st.markdown("""---""")
 
 @st.cache_data
@@ -110,7 +98,7 @@ def create_figure(df):
         showlegend=True,
         xaxis_type='category',
         yaxis=dict(type='linear', range=[1, 100], ticksuffix='%'),
-        title_text=f'Evolution of {slider_val} topics last week',
+        title_text=f'Evolution of Top {slider_val} News Topics Last Week',
         title_x=0.3,
         title_font_size=20,
         hovermode='x unified',
@@ -129,3 +117,10 @@ else:
     df = update_df(slider_val)
     fig = create_figure(df)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
+
+st.markdown("""---""")
+
+st.markdown(f"**NewsWatch** is currently based on:")
+col1, col2, col3, col4, col5 = st.columns(5)
+col2.metric("RSS Feeds", f"{'{:,}'.format(num_sources)}", help='Number of RSS feeds scraped')
+col4.metric("News Articles", f"{'{:,}'.format(num_documents)}", help='Number of news articles analyzed')
