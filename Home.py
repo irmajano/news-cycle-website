@@ -22,9 +22,8 @@ with st.sidebar:
 
 st.title("NewsWatch")
 st.subheader("Visualize last week's trending topics in world news")
-st.markdown(f"""
-**NewsWatch** is a news aggregator that collects news from the past week and boils them down to 20 topics for you to visualize and consult.\n
-""")
+st.markdown("""
+**NewsWatch** is a news aggregator that collects news from the past week and boils them down to <a href="/Topics" target="_self">20 topics</a> for you to visualize and consult.""", unsafe_allow_html=True)
 
 add_logo()
 

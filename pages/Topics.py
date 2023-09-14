@@ -24,7 +24,7 @@ for index, row in top_20.iterrows():
     text = ', '.join(row['representative_words'])
     # Create and generate a word cloud image:
     wordcloud = WordCloud().generate(text)
-    st.markdown(f"### *Topic:* {row['topic']}".title())
+    st.markdown(f"### *Topic #{index+1}:* {row['topic']}".title())
     # Display the generated image:
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
