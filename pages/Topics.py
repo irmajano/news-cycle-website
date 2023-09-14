@@ -7,10 +7,10 @@ st.set_page_config(layout="wide", page_title='Topics')
 
 add_logo()
 
-st.title("Top 20 Topics")
-st.subheader('Explore the top 20 topics of the past week.')
+st.title("Top Topics")
+st.subheader('Explore the top 20 topics of the past week')
 st.write('''
-Each topic represented by a <a href="http://amueller.github.io/word_cloud/" target="_blank">**word cloud**</a> that displays the most representative words forming it.''', unsafe_allow_html=True)
+Each topic is represented by a <a href="http://amueller.github.io/word_cloud/" target="_blank">**word cloud**</a> that displays the most representative words forming it.''', unsafe_allow_html=True)
 
 st.markdown("""---""")
 

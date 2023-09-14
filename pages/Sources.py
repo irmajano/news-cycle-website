@@ -10,13 +10,13 @@ add_logo()
 data = fetch_data()
 num_sources = data.get("feed_count", 0)
 
-st.subheader(f"NewsWatch is currently based on {num_sources} RSS feeds.")
+st.subheader(f"NewsWatch is currently based on {num_sources} RSS feeds")
 
 if data:
     sources_list = data.get("sources", [])
 
-    st.markdown(f"**NewsWatch** aggregates news from a wide-range of [RSS feeds](https://en.wikipedia.org/wiki/RSS) that are provided by the most prominent news outlets.")
-
+    st.write(f"""**NewsWatch** aggregates news from a wide range of <a href="https://en.wikipedia.org/wiki/RSS" target="_self">RSS feeds</a> provided by the most prominent news outlets.""", unsafe_allow_html=True)
+    st.write('Consult all the sources scraped using the form below.')
     st.markdown("""---""")
 
     # Search bar
