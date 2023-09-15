@@ -4,7 +4,6 @@ import pandas as pd
 from datetime import date
 from utils.utils import add_logo, fetch_data, create_df, get_top_20
 from random import shuffle
-from streamlit_card import card
 
 st.set_page_config(layout="wide", page_title='NewsWatch')
 
@@ -28,8 +27,6 @@ st.markdown(f"""
 """)
 
 add_logo()
-
-
 
 @st.cache_data
 def process_request(df):
@@ -71,19 +68,6 @@ def update_df(n_topics):
     new_df = new_df.round(2)
     return new_df
 
-
-st.markdown("""---""")
-
-st.markdown(f"**NewsWatch** is currently based on:")
-col1, col2, col3, col4, col5 = st.columns(5)
-col2.metric("RSS Feeds",
-            f"{'{:,}'.format(num_sources)}",
-            help='Number of RSS feeds scraped')
-col4.metric("News Articles",
-            f"{'{:,}'.format(num_documents)}",
-            help='Number of news articles analyzed')
-
-
 st.markdown("""---""")
 
 @st.cache_data
@@ -124,39 +108,19 @@ def create_figure(df):
     fig.update_xaxes(tickangle=45) #rotate x-axis labels
     return fig
 
+if submitted:
+    n_topics = slider_val
+    df = update_df(n_topics)
+    fig = create_figure(df)
+    st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
+else:
+    df = update_df(slider_val)
+    fig = create_figure(df)
+    st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
 
-updated_df = update_df(slider_val)
-fig = create_figure(updated_df)
-st.plotly_chart(fig, use_container_width=True, theme="streamlit", sharing="streamlit")
+st.markdown("""---""")
 
-
-
-# Extract the actual topics from the DataFrame
-df['representative_words'] = df['representative_words'].astype(str)
-topics = df.drop_duplicates(subset = ['topic','representative_words']).reset_index()
-
-# Split the topics into two columns for display
-col1, col2 = st.columns(2)
-# Create cards for each topic
-
-for i, row in updated_df.reset_index().iterrows():
-    representative_words = df[df['clean_topic']==row[0].strip()].drop_duplicates(['representative_words']).representative_words
-    with col1 if i % 2 == 0 else col2:
-        hasClicked = card(
-            key=representative_words,
-            title=row[0],
-            text=[f"Representative Words: {', '.join(representative_words)}"],
-            url='/Topics',
-            on_click=(lambda: None),
-            styles={
-                "card": {
-                    "width": "350px",
-                    "height": "250px",
-                    "border-radius": "10px",
-                    "background-color": "#121640",
-                    "padding": "10px"
-                },
-                "text": {
-                    "font-family": "sans-serif"
-                }
-            })
+st.markdown(f"**NewsWatch** is currently based on:")
+col1, col2, col3, col4, col5 = st.columns(5)
+col2.metric("RSS Feeds", f"{'{:,}'.format(num_sources)}", help='Number of RSS feeds scraped')
+col4.metric("News Articles", f"{'{:,}'.format(num_documents)}", help='Number of news articles analyzed')
