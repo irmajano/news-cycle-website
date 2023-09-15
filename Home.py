@@ -142,20 +142,21 @@ col1, col2 = st.columns(2)
 for i, row in updated_df.reset_index().iterrows():
     representative_words = df[df['clean_topic']==row[0].strip()].drop_duplicates(['representative_words']).representative_words
     with col1 if i % 2 == 0 else col2:
-        res = card(
+        hasClicked = card(
             key=representative_words,
             title=row[0],
-            text = [f"Representative Words: {', '.join(representative_words)}"],
+            text=[f"Representative Words: {', '.join(representative_words)}"],
+            url='/Topics',
+            on_click=(lambda: None),
             styles={
                 "card": {
                     "width": "350px",
                     "height": "250px",
                     "border-radius": "10px",
-                    "background-color" : "#121640",
+                    "background-color": "#121640",
                     "padding": "10px"
                 },
                 "text": {
                     "font-family": "sans-serif"
                 }
-            }
-        )
+            })
